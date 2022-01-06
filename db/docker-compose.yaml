@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+    postgres:
+        image: postgres:13
+        restart: always
+        environment:
+          - POSTGRES_USER=$DB_USER
+          - POSTGRES_PASSWORD=$DB_PASSWORD
+          - PGDATA=$hostdir/pgdata
+        volumes: 
+          - $hostdir:/var/lib/postgresql/data
+          # copy the sql script to create tables
+          - $hostdir/mysqldump.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    api-service:
+        image: ankur
+        environment:
+        - SQL_URI=postgresql://$DB_USER:$DB_PASSWORD@postgres:5432/work_samples
+        ports:
+        - "5000:5000"
