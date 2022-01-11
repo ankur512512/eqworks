@@ -1,6 +1,12 @@
 name: Continous Integration and Deployment
 
-on: [release, workflow_dispatch]
+on:
+  release:
+    types:
+    - created
+  push:
+    branches: 
+    - main
 
 jobs:
   ci:
