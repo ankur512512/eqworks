@@ -3,7 +3,7 @@ name: Continous Integration and Deployment
 on:
   release:
     types:
-    - created
+    - published
   push:
     branches: 
     - main
