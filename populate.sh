@@ -19,4 +19,5 @@ echo "$hostdir directory is created"
 localexport
 fi
 
+echo -e "Running docker-compose command now... make sure you have docker-compose command installed and available in your PATH\n"
 docker-compose up --build -d
