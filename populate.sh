@@ -1,9 +1,13 @@
 #!/bin/bash
 
+# Function to take mysql dump from remote server to local volume
+
 localexport() {
   docker run -it -e PGPASSWORD=$PGPASSWORD -e PGHOST=$PGHOST -e PGDATABASE=$PGDATABASE -e PGUSER=$PGUSER --rm --entrypoint pg_dump jbergknoff/postgresql-client -O -C -x > $hostdir/mysqldump.sql
 }
 
+
+#Checking if directory and mysqldump already exists
 if [ -d "$hostdir" ]; then
 echo "Directory already exists" ;
   if [ -z "$(ls -A $hostdir)" ]; then
@@ -11,11 +15,10 @@ echo "Directory already exists" ;
      localexport
   fi
 
-## Running postgresql database server with host volume.
-
+## Creating directory and populating with mysqlpdump
 else
 `mkdir -p $hostdir`;
-echo "$hostdir directory is created"
+echo -e "$hostdir directory is created.\n Now populating $hostdir with mysqldump"
 localexport
 fi
 
