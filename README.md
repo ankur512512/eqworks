@@ -31,7 +31,7 @@ Now, we can use the whole application stack with DB using the `docker-compose.ya
 ```
 ## User defined values for our own database. Give any of your choice.
 
-$ export hostdir=~/sqldump  #Directory where sqldump file will be created. Make sure your user has access to this directory
+$ export hostdir=/var/tmp  #Directory where sqldump file will be created. Make sure your user has access to create/read this directory
 $ export DB_USER=ankur
 $ export DB_PASSWORD=ankur123
 
