@@ -23,7 +23,7 @@ Here first we have containerized the python application using `Dockerfile` and t
 To build the application image from Dockerfile use below command:
 
 ```
-docker build -t ankur512512/eqworks-api:1.0 .
+$ docker build -t ankur512512/eqworks-api:1.0 .
 ```
 
 Now, we can use the whole application stack with DB using the `docker-compose.yaml` file. To do that first export the below environment variables in your shell:
