@@ -44,7 +44,7 @@ $ export PGUSER=<enter-username-here>
 $ export PGPASSWORD=<enter-password-here>
 ```
 
-After that just execute the `populate.sh` script as below and it will automatically check if sqldump is already present or not and will export the backup automatically and then run our own postgres database container to be used by the application. This single script will take care of populating the sql data and then running the whole stack (*both api and db containers*) using `docker-compose`.
+After that just execute the `populate.sh` script as below and it will automatically check if sqldump is already present or not and will export the backup accordingly and then run our own postgres database container to be used by the application. This single script will take care of populating the sql data and then running the whole application stack (*both api and db containers*) using `docker-compose`.
 
 ```
 $ bash ./populate.sh
