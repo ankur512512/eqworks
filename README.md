@@ -1,4 +1,4 @@
-# eqworks
+# Eqworks
 Devops + Terraform + Github actions + Python + docker-compose
 
 ### Prerequisites:
