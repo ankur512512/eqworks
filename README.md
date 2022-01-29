@@ -9,7 +9,7 @@ Devops + Terraform + Github actions + Python + docker-compose
 
 ### Commons Steps:
 
-To start with first clone this repo in you linux server:
+To start with, first clone this repo in you linux server:
 
 ``` 
 $ git clone https://github.com/ankur512512/eqworks.git
@@ -18,15 +18,15 @@ $ cd eqworks
 
 ## 1. Containerization
 
-Here first we have containerized the python application using `Dockerfile` and then used a postgresql client to fetch and store data from remote server (details of which were given in the question repo) to a local directory. That sql dump is then used to spin up a new postgresql docker container with our own credentials which will be used by our application.
+Here, we have containerized the python application using `Dockerfile` and then used a postgresql client (using a docker image) to fetch and store data from remote server (*details of which were given in the question repo*) to a local directory. That sql dump is then used to spin up a new postgresql docker container with our own credentials which will be used by our application.
 
-To build the application image from Dockerfile use below command:
+To build the docker image, for the application api, from Dockerfile; use below command:
 
 ```
 $ docker build -t ankur512512/eqworks-api:1.0 .
 ```
 
-Now, we can use the whole application stack with DB using the `docker-compose.yaml` file. To do that first export the below environment variables in your shell:
+Now, we can use the whole application stack including DB using the `docker-compose.yaml` file. To do that first export the below environment variables in your shell:
 
 ```
 ## User defined values for our own database. Give any of your choice.
@@ -44,13 +44,13 @@ $ export PGUSER=<enter-username-here>
 $ export PGPASSWORD=<enter-password-here>
 ```
 
-After that just run the `populate.sh` command as below and it will automatically populate check if sqldump is already present or not and will export the backup automatically and then run our own postgres database container to be used by the application.
+After that just execute the `populate.sh` script as below and it will automatically check if sqldump is already present or not and will export the backup automatically and then run our own postgres database container to be used by the application.
 
 ```
 $ bash ./populate.sh
 ```
 
-Give it some time until you see that both the api and db containers are running fine. Then to check if connectivity is working fine with both api and db use below command:
+It will sleep for 15 seconds so that both the api and db containers are running fine and will automatically curl the required url as well for you. Still to check if connectivity is working fine with both api and db use below command:
 
 ```
 $ curl localhost:5000/poi
@@ -65,7 +65,7 @@ You should see results like below:
 This verifies that our application `api` is working fine and is also able to connect to the `db` service. Once you are done with the testing do a cleanup of everything using below command:
 
 ```
-$ docker-compose rm -s -f
+$ docker-compose rm -sf
 ```
 
 ## 2. Continuous integration and deployment
@@ -78,19 +78,19 @@ Notice that the image `ankur512512/eqworks-api:1.0` is being pushed to docker hu
 
 https://hub.docker.com/r/ankur512512/eqworks-api/tags
 
-These published images are then used in the next steps in `kubernetes`.
+This published image is then used in the next steps in `kubernetes`.
 
 ## 3. Infrastructure codification
 
-In this step we will use the `terraform` manifests to automatically create pods and services for both api and db. We will be creating `ClusterIP` service for db as we want it to be used internally by the api only and `NodePort` service for the api as we want to be able to access it from outside the k8s cluster (on cloud infrastructure `LoadBalancer` service could be used as well).
+In this step we will use the `terraform` manifests to automatically create pods and services for both api and db. We will be creating `ClusterIP` service for db as we want it to be used internally by the api only and `NodePort` service for the api as we want to be able to access it from outside the k8s cluster (on cloud infrastructure `LoadBalancer` service could be used as well). For the db part, I have used a db image that I built having all the data taken from the backup database server already, as using volume mounts was not that straight forward with `minikube`.
 
 Please export the below environment variables first:
 
 ```
-## Give any value of your choice
+## Give any value of your choice to connect to postgresql database
 
-$ export TF_VAR_db_user=ankur
-$ export TF_VAR_db_pass=ankur123
+$ export TF_VAR_db_user=ankur   #Username to access your database
+$ export TF_VAR_db_pass=ankur123  #Password to access your database
 ```
 
 After this, run the below shell script to automatically `initialize` and `apply` the terraform code.
@@ -99,7 +99,7 @@ After this, run the below shell script to automatically `initialize` and `apply`
 $ bash ./terraform_apply.sh
 ```
 
-Wait for all the k8s resources to get created and get ready, then check the connectivity using below command:
+The script will automatically sleep for 15sec after all the k8s resources are created, to let them come in ready state, then it will check the connectivity using below command automatically:
 
 ```
 $ curl `minikube ip`:30007/poi
@@ -121,5 +121,7 @@ $ terraform -chdir=./terraform destroy --auto-approve
 
 ## 4. API performance testing
 
-Having zero experience in this, tried a few things with `JMeter` and I could see that if I hit 5k or more requests simultaneously on the api then it started giving errors regarding service unavailable. To fix that we can distribute the load as per our choice, for example, `for 10k users we should ideally have 3 replicas each for both api and db.`
+Having zero experience in this, tried a few things with `JMeter` and I could see that if I hit 5k or more requests simultaneously on the api then it started giving errors regarding service unavailable. To fix that we can distribute the load as per our choice, for example, `for 10k users we should ideally have 3 replicas for api and atleast 2 replicas for db.`
+
+Might need to dig in more to capture other metrics.
 
